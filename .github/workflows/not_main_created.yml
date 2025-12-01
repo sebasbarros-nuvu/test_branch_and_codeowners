@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - main
       - develop
-      - test
+      # - test
       - release/**
       - hotfix/**
       - feature/**
