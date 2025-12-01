@@ -1,0 +1,23 @@
+name: Validate branch creation
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+      - test
+      - release/**
+      - hotfix/**
+      - feature/**
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate base branch
+        run: |
+          BASE=$(git branch -r --contains HEAD | grep origin/main || true)
+          if [ ! -z "$BASE" ]; then
+            echo "❌ No puedes crear ramas directamente desde main."
+            exit 1
+          fi
