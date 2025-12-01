@@ -3,7 +3,7 @@ name: Validate branch origin
 on:
   push:
     branches:
-      - '**'
+      - '*'
     branches-ignore:
       - main
 
