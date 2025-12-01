@@ -1,0 +1,25 @@
+name: Validate PR target main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate PR source branch
+        run: |
+          echo "Validating PR source branch for main..."
+
+          SOURCE="${GITHUB_HEAD_REF}"
+
+          if [[ "$SOURCE" =~ ^release/.*$ || "$SOURCE" =~ ^hotfix/.*$ ]]; then
+            echo "✔ Valid branch type for merging into main."
+          else
+            echo "❌ Invalid branch type for merging into main."
+            echo "main only accepts PR from release/* or hotfix/*."
+            exit 1
+          fi
