@@ -1,29 +1,32 @@
-name: Validate branch creation
+name: Validate branch origin
 
 on:
   push:
+    branches:
+      - '**'
     branches-ignore:
       - main
-      - develop
-      # - test
-      - release/**
-      - hotfix/**
-      - feature/**
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    steps:
 
-      - name: Checkout repository
+    steps:
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate base branch
+      - name: Fetch all
+        run: git fetch --all
+
+      - name: Validate that branch is not created from main
         run: |
-          git fetch --all
-          git branch
-          BASE=$(git branch -r --contains HEAD | grep origin/main || true)
-          if [ ! -z "$BASE" ]; then
-            echo "❌ No puedes crear ramas directamente desde main."
+          echo "Validating branch creation..."
+          CURRENT=$(git rev-parse HEAD)
+
+          echo "Checking if HEAD exists in origin/main..."
+          if git merge-base --is-ancestor "$CURRENT" origin/main; then
+            echo "❌ No puedes crear ramas desde main."
             exit 1
           fi
+
+          echo "✔️ Validación pasada. La rama no proviene de main."
