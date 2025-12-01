@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - main
       - develop
-      # - test
+      - test
       - release/**
       - hotfix/**
       - feature/**
@@ -14,8 +14,13 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Validate base branch
         run: |
+          git fetch --all
           BASE=$(git branch -r --contains HEAD | grep origin/main || true)
           if [ ! -z "$BASE" ]; then
             echo "❌ No puedes crear ramas directamente desde main."
