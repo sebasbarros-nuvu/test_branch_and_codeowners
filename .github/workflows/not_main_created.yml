@@ -21,6 +21,7 @@ jobs:
       - name: Validate base branch
         run: |
           git fetch --all
+          git branch
           BASE=$(git branch -r --contains HEAD | grep origin/main || true)
           if [ ! -z "$BASE" ]; then
             echo "❌ No puedes crear ramas directamente desde main."
