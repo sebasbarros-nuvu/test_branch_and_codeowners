@@ -1,0 +1,50 @@
+name: Validate PR Source Branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR branch rules
+        run: |
+          BASE_BRANCH="${{ github.base_ref }}"
+          HEAD_BRANCH="${{ github.head_ref }}"
+          
+          echo "PR: $HEAD_BRANCH -> $BASE_BRANCH"
+          
+          # Validar merge a main
+          if [[ "$BASE_BRANCH" == "main" ]]; then
+            if [[ ! "$HEAD_BRANCH" =~ ^(release/|hotfix/) ]]; then
+              echo "❌ Error: Solo se permite merge a 'main' desde ramas 'release/*' o 'hotfix/*'"
+              exit 1
+            fi
+          fi
+          
+          # Validar merge a release/*
+          if [[ "$BASE_BRANCH" =~ ^release/ ]]; then
+            if [[ "$HEAD_BRANCH" != "test" ]]; then
+              echo "❌ Error: Solo se permite merge a 'release/*' desde 'test'"
+              exit 1
+            fi
+          fi
+          
+          # Validar merge a test
+          if [[ "$BASE_BRANCH" == "test" ]]; then
+            if [[ "$HEAD_BRANCH" != "devs" ]]; then
+              echo "❌ Error: Solo se permite merge a 'test' desde 'devs'"
+              exit 1
+            fi
+          fi
+          
+          # Validar merge a devs
+          if [[ "$BASE_BRANCH" == "devs" ]]; then
+            if [[ ! "$HEAD_BRANCH" =~ ^(feature/|hotfix/) ]]; then
+              echo "❌ Error: Solo se permite merge a 'devs' desde ramas 'feature/*' o 'hotfix/*'"
+              exit 1
+            fi
+          fi
+          
+          echo "✅ Validación exitosa"
